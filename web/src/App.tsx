@@ -1,44 +1,44 @@
-import { useEffect, useState } from "react"
-import { createTodo, deleteTodo, getTodos, updateTodo } from "../services/api"
+// App.tsx
+import { Space, Spin, Typography } from "antd"
 import TodoForm from "./components/TodoForm"
 import TodoList from "./components/TodoList"
-import type ITodo from "./types/type"
+import { useTodos } from "./hooks/useTodos"
+
+const { Title } = Typography;
 
 const App = () => {
-  const [todos, setTodos] = useState<ITodo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { todos, loading, addTodo, removeTodo, editTodo } = useTodos();
 
-  useEffect(() => {
-    const fetchTodos = async () => {
-      setLoading(true);
-      const data = await getTodos();
-      setTodos(data);
-      setLoading(false);
-    };
-    fetchTodos();
-  }, []);
-
-  const handleAdd = async (text: string) => {
-    const newTodo = await createTodo(text);
-    setTodos((prev) => [...prev, newTodo]);
-  };
-
-  const handleToggle = async (id: string, completed: boolean) => {
-    const updated = await updateTodo(id, completed);
-    setTodos((prev) => prev.map((t) => (t._id === id ? updated : t)));
-  };
-
-  const handleDelete = async (id: string) => {
-    await deleteTodo(id);
-    setTodos((prev) => prev.filter((t) => t._id !== id));
-  };
-
-  if (loading) return <div>Loading...</div>;
-
+  if (loading) {
   return (
-    <div style={{ maxWidth: 600, margin: "0 auto", padding: 20 }}>
-      <TodoForm onAdd={handleAdd} />
-      <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} />
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <Spin size="large" />
+    </div>
+  );
+}
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: 24,
+        background: "#f0f2f5",
+      }}
+    >
+      <Space
+        direction="vertical"
+        style={{ width: "100%", maxWidth: 600 }}
+      >
+        <Title style={{ textAlign: "center" }}>My Todo List</Title>
+        <TodoForm onAdd={addTodo} />
+        <TodoList
+          todos={todos}
+          editTodo={editTodo}
+          onDelete={removeTodo}
+        />
+      </Space>
     </div>
   );
 };

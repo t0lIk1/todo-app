@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API = axios.create({
-	baseURL: 'http://localhost:3000/api',
+export const API = axios.create({
+	baseURL: `${import.meta.env.VITE_API_URL}/api`,
 });
 
 export const getTodos = async () => {
@@ -14,8 +14,11 @@ export const createTodo = async (todoText: string) => {
 	return data;
 };
 
-export const updateTodo = async (id: string, completed: boolean) => {
-	const { data } = await API.put(`/todos/${id}`, { completed });
+export const updateTodo = async (
+	id: string,
+	body: { todoText?: string; completed?: boolean }
+) => {
+	const { data } = await API.put(`/todos/${id}`, body);
 	return data;
 };
 
